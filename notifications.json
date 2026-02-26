@@ -1,0 +1,62 @@
+notifications_config = '''{
+  "version": "1.0.0",
+  "app_name": "PC Maintenance Scheduler",
+  "notification_settings": {
+    "default_title": "🔧 PC Maintenance Due",
+    "default_icon": "icon-192x192.png",
+    "default_badge": "icon-72x72.png",
+    "vibration_pattern": [200, 100, 200],
+    "sound_enabled": true,
+    "require_interaction": true,
+    "auto_close_delay": 10000
+  },
+  "triggers": {
+    "overdue": {
+      "title": "⚠️ OVERDUE: {computer}",
+      "body": "{type} was scheduled for {time}",
+      "priority": "high",
+      "vibrate": [300, 100, 300, 100, 300]
+    },
+    "due_now": {
+      "title": "🔔 {computer} - Maintenance Due!",
+      "body": "{type} scheduled now at {time}",
+      "priority": "high",
+      "vibrate": [200, 100, 200]
+    },
+    "soon": {
+      "title": "⏰ {computer} - Coming Up",
+      "body": "{type} in less than 1 hour ({time})",
+      "priority": "normal",
+      "vibrate": [100, 50, 100]
+    }
+  },
+  "platforms": {
+    "ios": {
+      "supports_push": false,
+      "supports_background": false,
+      "requires_user_interaction": true,
+      "note": "iOS requires app to be added to home screen for notifications"
+    },
+    "android": {
+      "supports_push": true,
+      "supports_background": true,
+      "supports_persistent": true
+    },
+    "desktop": {
+      "supports_push": true,
+      "supports_background": true,
+      "supports_persistent": true
+    }
+  },
+  "permissions": {
+    "notification": "required",
+    "audio": "optional",
+    "storage": "required"
+  }
+}'''
+
+with open('/mnt/kimi/output/notifications.json', 'w', encoding='utf-8') as f:
+    f.write(notifications_config)
+
+print("✅ notifications.json created!")
+print(f"📄 Size: {len(notifications_config):,} characters")
