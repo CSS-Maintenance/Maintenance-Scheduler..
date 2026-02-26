@@ -1,0 +1,1637 @@
+html_content = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d1117">
+<title>PC Maintenance Scheduler</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192x192.png">
+<style>
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    --ict-bg: #0d1117;
+    --ict-dark: #161b22;
+    --ict-border: #30363d;
+    --ict-accent: #58a6ff;
+    --ict-success: #238636;
+    --ict-warning: #f85149;
+    --ict-text: #c9d1d9;
+    --ict-muted: #8b949e;
+    --ict-cyan: #39d0d8;
+    --ict-purple: #a371f7;
+}
+
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+    min-height: 100vh;
+    padding: 10px;
+    color: var(--ict-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Auth Screens */
+.auth-container {
+    max-width: 400px;
+    margin: 20px auto;
+    background: var(--ict-dark);
+    border-radius: 16px;
+    border: 1px solid var(--ict-border);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-header {
+    background: linear-gradient(135deg, var(--ict-dark), var(--ict-bg));
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--ict-border);
+}
+
+.auth-logo {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.auth-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ict-accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.auth-subtitle {
+    color: var(--ict-muted);
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.auth-body {
+    padding: 25px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 14px;
+    background: var(--ict-bg);
+    border: 1px solid var(--ict-border);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--ict-text);
+    transition: all 0.3s;
+    -webkit-appearance: none;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: var(--ict-accent);
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--ict-success), #2ea043);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    -webkit-appearance: none;
+    touch-action: manipulation;
+}
+
+.auth-btn:hover, .auth-btn:active {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(35,134,54,0.4);
+}
+
+.auth-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.auth-link {
+    text-align: center;
+    color: var(--ict-muted);
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.auth-link a {
+    color: var(--ict-accent);
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    background: rgba(248,81,73,0.2);
+    border: 1px solid var(--ict-warning);
+    color: var(--ict-warning);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    display: none;
+}
+
+.error-message.visible {
+    display: block;
+}
+
+/* Main App Container */
+.app-container {
+    display: none;
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--ict-dark);
+    border-radius: 16px;
+    border: 1px solid var(--ict-border);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    animation: fadeIn 0.3s ease;
+}
+
+/* Header */
+.pc-header {
+    background: var(--ict-bg);
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--ict-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pc-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ict-accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pc-title::before {
+    content: '◉';
+    color: var(--ict-success);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.user-badge {
+    background: var(--ict-bg);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--ict-border);
+    color: var(--ict-cyan);
+    font-weight: 600;
+}
+
+.logout-btn {
+    background: transparent;
+    border: 1px solid var(--ict-warning);
+    color: var(--ict-warning);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+    font-weight: 600;
+    touch-action: manipulation;
+}
+
+.logout-btn:hover, .logout-btn:active {
+    background: var(--ict-warning);
+    color: white;
+}
+
+/* Status Bar */
+.status-bar {
+    display: flex;
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--ict-bg);
+    border-bottom: 1px solid var(--ict-border);
+    flex-wrap: wrap;
+}
+
+.status-pill {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid;
+    background: var(--ict-dark);
+}
+
+.status-active {
+    border-color: var(--ict-success);
+    color: var(--ict-success);
+}
+
+.status-inactive {
+    border-color: var(--ict-warning);
+    color: var(--ict-warning);
+}
+
+.status-pending {
+    border-color: var(--ict-accent);
+    color: var(--ict-accent);
+}
+
+/* Main Content */
+.pc-content {
+    padding: 20px;
+}
+
+/* Enable Button */
+.enable-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--ict-purple), #8957e5);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    display: none;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+}
+
+.enable-btn:hover, .enable-btn:active {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(163,113,247,0.4);
+}
+
+.enable-btn.visible {
+    display: block;
+}
+
+/* Form Styling */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ict-muted);
+    font-weight: 600;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    background: var(--ict-bg);
+    border: 1px solid var(--ict-border);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--ict-text);
+    transition: all 0.3s;
+    -webkit-appearance: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--ict-accent);
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+}
+
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2358a6ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+}
+
+/* Buttons */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    flex: 2;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--ict-success), #2ea043);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+}
+
+.btn-primary:hover, .btn-primary:active {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(35,134,54,0.4);
+}
+
+.btn-secondary {
+    flex: 1;
+    padding: 14px;
+    background: transparent;
+    color: var(--ict-warning);
+    border: 1px solid var(--ict-warning);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+}
+
+.btn-secondary:hover, .btn-secondary:active {
+    background: var(--ict-warning);
+    color: white;
+}
+
+/* Task Section */
+.task-section {
+    border-top: 1px solid var(--ict-border);
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.task-header h3 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ict-accent);
+}
+
+.task-count {
+    background: var(--ict-bg);
+    color: var(--ict-accent);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid var(--ict-border);
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-item {
+    background: var(--ict-bg);
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 3px solid var(--ict-accent);
+    position: relative;
+    transition: all 0.3s;
+    border: 1px solid var(--ict-border);
+}
+
+.task-item:hover {
+    transform: translateX(3px);
+    border-color: var(--ict-accent);
+}
+
+.task-item.overdue {
+    border-left-color: var(--ict-warning);
+    border-color: var(--ict-warning);
+    background: rgba(248,81,73,0.1);
+}
+
+.task-item.soon {
+    border-left-color: #f0883e;
+    border-color: #f0883e;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { box-shadow: 0 0 5px rgba(240,136,62,0.2); }
+    50% { box-shadow: 0 0 15px rgba(240,136,62,0.4); }
+}
+
+.task-computer {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ict-text);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.task-computer::before {
+    content: '💻';
+}
+
+.task-meta {
+    font-size: 13px;
+    color: var(--ict-muted);
+    line-height: 1.5;
+}
+
+.task-meta strong {
+    color: var(--ict-accent);
+}
+
+.time-remaining {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--ict-dark);
+    color: var(--ict-accent);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    border: 1px solid var(--ict-border);
+}
+
+.task-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+}
+
+.btn-delete {
+    background: transparent;
+    color: var(--ict-warning);
+    border: 1px solid var(--ict-warning);
+}
+
+.btn-delete:hover, .btn-delete:active {
+    background: var(--ict-warning);
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ict-muted);
+    border: 2px dashed var(--ict-border);
+    border-radius: 12px;
+}
+
+.empty-state-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+/* Audio Toggle */
+.audio-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: var(--ict-dark);
+    border: 1px solid var(--ict-border);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 1000;
+    color: var(--ict-accent);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    touch-action: manipulation;
+    -webkit-appearance: none;
+}
+
+.audio-toggle.muted {
+    opacity: 0.5;
+    color: var(--ict-muted);
+}
+
+/* Notification Modal */
+.notification-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.notification-modal {
+    background: var(--ict-dark);
+    padding: 30px 25px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 350px;
+    width: 100%;
+    border: 1px solid var(--ict-accent);
+    box-shadow: 0 0 60px rgba(88,166,255,0.2);
+    animation: modalPop 0.3s ease;
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.notification-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+    animation: bellRing 0.5s ease infinite;
+}
+
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.notification-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ict-accent);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.notification-text {
+    color: var(--ict-muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.btn-dismiss {
+    background: linear-gradient(135deg, var(--ict-accent), #1f6feb);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .audio-toggle {
+        top: max(10px, env(safe-area-inset-top));
+    }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    body {
+        padding: 5px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .pc-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 12px 15px;
+    }
+    
+    .pc-title {
+        font-size: 14px;
+    }
+    
+    .status-bar {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .status-pill {
+        min-width: auto;
+    }
+    
+    .auth-container {
+        margin: 10px auto;
+    }
+    
+    .pc-content {
+        padding: 15px;
+    }
+    
+    .task-item {
+        padding: 12px;
+    }
+    
+    .time-remaining {
+        position: static;
+        display: inline-block;
+        margin-top: 8px;
+    }
+}
+</style>
+</head>
+<body>
+
+<button class="audio-toggle" id="audioToggle" onclick="toggleAudio()" title="Toggle sound">🔊</button>
+
+<div class="notification-overlay" id="notificationOverlay" onclick="dismissNotification()">
+    <div class="notification-modal" onclick="event.stopPropagation()">
+        <div class="notification-icon">🔔</div>
+        <div class="notification-title" id="notifTitle">Maintenance Due!</div>
+        <div class="notification-text" id="notifText">Task details here</div>
+        <button class="btn-dismiss" onclick="dismissNotification()">Dismiss</button>
+    </div>
+</div>
+
+<!-- Login Screen -->
+<div id="loginScreen" class="auth-container">
+    <div class="auth-header">
+        <div class="auth-logo">🔧</div>
+        <div class="auth-title">PC Maintenance</div>
+        <div class="auth-subtitle">Login to access scheduler</div>
+    </div>
+    <div class="auth-body">
+        <div class="error-message" id="loginError"></div>
+        <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+            <input type="text" class="auth-input" id="loginUsername" placeholder="Username" required autocomplete="username">
+            <input type="password" class="auth-input" id="loginPassword" placeholder="Password" required autocomplete="current-password">
+            <button type="submit" class="auth-btn" id="loginBtn">Login</button>
+        </form>
+        <div class="auth-link">
+            Don't have an account? <a onclick="showRegister()">Register</a>
+        </div>
+    </div>
+</div>
+
+<!-- Register Screen -->
+<div id="registerScreen" class="auth-container hidden">
+    <div class="auth-header">
+        <div class="auth-logo">📝</div>
+        <div class="auth-title">Create Account</div>
+        <div class="auth-subtitle">Register new user</div>
+    </div>
+    <div class="auth-body">
+        <div class="error-message" id="registerError"></div>
+        <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+            <input type="text" class="auth-input" id="regUsername" placeholder="Username" required autocomplete="username">
+            <input type="password" class="auth-input" id="regPassword" placeholder="Password" required autocomplete="new-password">
+            <input type="password" class="auth-input" id="regConfirmPassword" placeholder="Confirm Password" required autocomplete="new-password">
+            <button type="submit" class="auth-btn" id="registerBtn">Register</button>
+        </form>
+        <div class="auth-link">
+            Already have an account? <a onclick="showLogin()">Login</a>
+        </div>
+    </div>
+</div>
+
+<!-- Main App -->
+<div id="mainApp" class="app-container">
+    <div class="pc-header">
+        <div class="pc-title">PC Maintenance Scheduler</div>
+        <div class="user-info">
+            <span class="user-badge" id="currentUser">User</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+        <div class="status-pill status-inactive" id="notifStatus">🔕 Off</div>
+        <div class="status-pill status-pending" id="timerStatus">⏱️ Waiting</div>
+    </div>
+
+    <div class="pc-content">
+        <button id="enableNotifBtn" class="enable-btn" onclick="enableNotifications()">
+            🔔 Enable Notifications
+        </button>
+
+        <form id="maintenanceForm" onsubmit="handleSaveTask(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Computer Unit</label>
+                    <select id="computer" required>
+                        <option value="">Select Computer</option>
+                        <option>PC-01</option>
+                        <option>PC-02</option>
+                        <option>PC-03</option>
+                        <option>PC-04</option>
+                        <option>PC-05</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Maintenance Type</label>
+                    <select id="type" required>
+                        <option value="">Select Type</option>
+                        <option>Cleaning</option>
+                        <option>Software Update</option>
+                        <option>Hardware Check</option>
+                        <option>Troubleshooting</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="time" id="time" required step="1">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Notes (Optional)</label>
+                    <textarea id="notes" rows="3" placeholder="Additional details..."></textarea>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-primary" id="saveBtn">💾 Save Task</button>
+                <button type="button" class="btn-secondary" onclick="resetForm()">❌ Cancel</button>
+            </div>
+        </form>
+
+        <div class="task-section">
+            <div class="task-header">
+                <h3>📋 Upcoming Tasks</h3>
+                <span class="task-count" id="taskCount">0</span>
+            </div>
+            <div class="task-list" id="taskList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <div>No tasks scheduled</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==========================================
+// GLOBAL STATE
+// ==========================================
+let currentUser = null;
+let audioContext = null;
+let audioEnabled = true;
+let nextTaskTimeout = null;
+let checkInterval = null;
+let swRegistration = null;
+let isOnline = navigator.onLine;
+
+// ==========================================
+// INITIALIZATION
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 App initializing...');
+    initAudio();
+    checkAuth();
+    setupEventListeners();
+    registerServiceWorker();
+    
+    // Set min date for date input
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+        dateInput.min = new Date().toISOString().split('T')[0];
+    }
+});
+
+function setupEventListeners() {
+    // Online/offline detection
+    window.addEventListener('online', () => {
+        isOnline = true;
+        console.log('📶 Back online');
+    });
+    
+    window.addEventListener('offline', () => {
+        isOnline = false;
+        console.log('📴 Offline mode');
+    });
+    
+    // Visibility change for mobile
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && currentUser) {
+            scheduleNextCheck();
+        }
+    });
+    
+    // Keep alive check every 30 seconds
+    setInterval(() => {
+        if (!document.hidden && currentUser) {
+            scheduleNextCheck();
+        }
+    }, 30000);
+}
+
+// ==========================================
+// AUTHENTICATION FUNCTIONS
+// ==========================================
+function checkAuth() {
+    console.log('🔐 Checking authentication...');
+    const savedUser = localStorage.getItem('currentUser');
+    
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+            console.log('✅ User authenticated:', currentUser.username);
+            showMainApp();
+        } catch (e) {
+            console.error('❌ Error parsing user data:', e);
+            localStorage.removeItem('currentUser');
+            showLogin();
+        }
+    } else {
+        console.log('ℹ️ No user logged in');
+        showLogin();
+    }
+}
+
+function showLogin() {
+    console.log('📱 Showing login screen');
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('registerScreen').classList.add('hidden');
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('loginError').classList.remove('visible');
+    document.getElementById('loginForm').reset();
+}
+
+function showRegister() {
+    console.log('📱 Showing register screen');
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('registerScreen').classList.remove('hidden');
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('registerError').classList.remove('visible');
+    document.getElementById('registerForm').reset();
+}
+
+function showMainApp() {
+    console.log('🏠 Showing main app');
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('registerScreen').classList.add('hidden');
+    document.getElementById('mainApp').style.display = 'block';
+    document.getElementById('currentUser').textContent = currentUser.username;
+    
+    // Initialize app
+    renderTasks();
+    updateStatus();
+    scheduleNextCheck();
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    console.log('🔑 Login attempt...');
+    
+    const btn = document.getElementById('loginBtn');
+    const errorDiv = document.getElementById('loginError');
+    
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+    
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    // Simulate network delay for better UX
+    setTimeout(() => {
+        try {
+            const users = JSON.parse(localStorage.getItem('pc_users') || '[]');
+            console.log('👥 Total users:', users.length);
+            
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                console.log('✅ Login successful');
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                errorDiv.classList.remove('visible');
+                showMainApp();
+            } else {
+                console.log('❌ Invalid credentials');
+                errorDiv.textContent = 'Invalid username or password!';
+                errorDiv.classList.add('visible');
+                btn.disabled = false;
+                btn.textContent = 'Login';
+            }
+        } catch (e) {
+            console.error('❌ Login error:', e);
+            errorDiv.textContent = 'An error occurred. Please try again.';
+            errorDiv.classList.add('visible');
+            btn.disabled = false;
+            btn.textContent = 'Login';
+        }
+    }, 500);
+}
+
+function handleRegister(e) {
+    e.preventDefault();
+    console.log('📝 Registration attempt...');
+    
+    const btn = document.getElementById('registerBtn');
+    const errorDiv = document.getElementById('registerError');
+    
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
+    
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('regConfirmPassword').value;
+    
+    // Validation
+    if (password !== confirmPassword) {
+        errorDiv.textContent = 'Passwords do not match!';
+        errorDiv.classList.add('visible');
+        btn.disabled = false;
+        btn.textContent = 'Register';
+        return;
+    }
+    
+    if (password.length < 4) {
+        errorDiv.textContent = 'Password must be at least 4 characters!';
+        errorDiv.classList.add('visible');
+        btn.disabled = false;
+        btn.textContent = 'Register';
+        return;
+    }
+    
+    setTimeout(() => {
+        try {
+            let users = JSON.parse(localStorage.getItem('pc_users') || '[]');
+            
+            if (users.find(u => u.username === username)) {
+                errorDiv.textContent = 'Username already exists!';
+                errorDiv.classList.add('visible');
+                btn.disabled = false;
+                btn.textContent = 'Register';
+                return;
+            }
+            
+            const newUser = {
+                id: 'user_' + Date.now(),
+                username: username,
+                password: password,
+                created: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('pc_users', JSON.stringify(users));
+            
+            console.log('✅ Registration successful');
+            
+            // Auto login
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            
+            alert('✅ Account created successfully!');
+            showMainApp();
+            
+        } catch (e) {
+            console.error('❌ Registration error:', e);
+            errorDiv.textContent = 'An error occurred. Please try again.';
+            errorDiv.classList.add('visible');
+            btn.disabled = false;
+            btn.textContent = 'Register';
+        }
+    }, 500);
+}
+
+function logout() {
+    console.log('👋 Logging out...');
+    if (confirm('Are you sure you want to logout?')) {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        
+        if (nextTaskTimeout) clearTimeout(nextTaskTimeout);
+        if (checkInterval) clearInterval(checkInterval);
+        
+        showLogin();
+    }
+}
+
+// ==========================================
+// AUDIO FUNCTIONS
+// ==========================================
+function initAudio() {
+    try {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            console.log('🔊 Audio context initialized');
+        }
+    } catch (e) {
+        console.warn('⚠️ Audio not supported');
+    }
+}
+
+function playAlertSound() {
+    if (!audioEnabled || !audioContext) {
+        console.log('🔇 Audio muted or not available');
+        return;
+    }
+    
+    try {
+        // Resume context if suspended (iOS requirement)
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 0.1);
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime + 0.2);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        
+        setTimeout(() => {
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            osc2.frequency.setValueAtTime(880, audioContext.currentTime);
+            gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            osc2.start(audioContext.currentTime);
+            osc2.stop(audioContext.currentTime + 0.5);
+        }, 200);
+        
+        console.log('🔔 Alert sound played');
+    } catch (e) {
+        console.error('❌ Error playing sound:', e);
+    }
+}
+
+function toggleAudio() {
+    audioEnabled = !audioEnabled;
+    const btn = document.getElementById('audioToggle');
+    btn.textContent = audioEnabled ? '🔊' : '🔇';
+    btn.classList.toggle('muted', !audioEnabled);
+    
+    if (audioEnabled) {
+        initAudio();
+        // Try to resume context
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+    }
+    
+    console.log('🔊 Audio:', audioEnabled ? 'ON' : 'OFF');
+}
+
+// ==========================================
+// SERVICE WORKER & NOTIFICATIONS
+// ==========================================
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => {
+                console.log('✅ Service Worker registered:', reg.scope);
+                swRegistration = reg;
+                updateStatus();
+                
+                // Listen for messages from SW
+                navigator.serviceWorker.addEventListener('message', event => {
+                    console.log('📨 Message from SW:', event.data);
+                    if (event.data?.type === 'TASK_DUE') {
+                        const schedules = getSchedules();
+                        const task = schedules.find(t => t.id === event.data.taskId);
+                        if (task) triggerNotification(task);
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('❌ SW registration failed:', err);
+                // Continue without SW - app still works
+            });
+    } else {
+        console.log('ℹ️ Service Worker not supported');
+    }
+}
+
+function updateStatus() {
+    const notifStatus = document.getElementById('notifStatus');
+    const timerStatus = document.getElementById('timerStatus');
+    const btn = document.getElementById('enableNotifBtn');
+    
+    if (!('Notification' in window)) {
+        notifStatus.textContent = '🔕 Not Supported';
+        notifStatus.className = 'status-pill status-inactive';
+        btn.classList.remove('visible');
+        return;
+    }
+    
+    if (Notification.permission === 'granted') {
+        notifStatus.textContent = '🔔 Active';
+        notifStatus.className = 'status-pill status-active';
+        timerStatus.textContent = '⏱️ Monitoring';
+        timerStatus.className = 'status-pill status-active';
+        btn.classList.remove('visible');
+    } else if (Notification.permission === 'denied') {
+        notifStatus.textContent = '❌ Blocked';
+        notifStatus.className = 'status-pill status-inactive';
+        btn.classList.remove('visible');
+    } else {
+        notifStatus.textContent = '🔕 Off';
+        notifStatus.className = 'status-pill status-inactive';
+        timerStatus.textContent = '⏱️ Waiting';
+        btn.classList.add('visible');
+    }
+}
+
+async function enableNotifications() {
+    console.log('🔔 Enabling notifications...');
+    initAudio();
+    
+    if (!('Notification' in window)) {
+        alert('Notifications not supported on this device');
+        return;
+    }
+    
+    try {
+        const permission = await Notification.requestPermission();
+        console.log('📱 Notification permission:', permission);
+        updateStatus();
+        
+        if (permission === 'granted') {
+            // Show test notification
+            showTestNotification();
+        }
+    } catch (err) {
+        console.error('❌ Error requesting permission:', err);
+    }
+}
+
+function showTestNotification() {
+    const title = '✅ Notifications Active';
+    const options = {
+        body: 'You will receive maintenance alerts with sound',
+        icon: 'icon-192x192.png',
+        badge: 'icon-72x72.png',
+        tag: 'test',
+        requireInteraction: false
+    };
+    
+    if (swRegistration) {
+        swRegistration.showNotification(title, options);
+    } else {
+        new Notification(title, options);
+    }
+}
+
+// ==========================================
+// DATA MANAGEMENT
+// ==========================================
+function getSchedules() {
+    if (!currentUser) return [];
+    const key = 'pc_schedules_' + currentUser.id;
+    try {
+        return JSON.parse(localStorage.getItem(key)) || [];
+    } catch (e) {
+        console.error('❌ Error reading schedules:', e);
+        return [];
+    }
+}
+
+function saveSchedules(schedules) {
+    if (!currentUser) return;
+    const key = 'pc_schedules_' + currentUser.id;
+    try {
+        localStorage.setItem(key, JSON.stringify(schedules));
+    } catch (e) {
+        console.error('❌ Error saving schedules:', e);
+        alert('Error saving task. Storage may be full.');
+    }
+}
+
+// ==========================================
+// TASK MANAGEMENT
+// ==========================================
+function handleSaveTask(e) {
+    e.preventDefault();
+    console.log('💾 Saving task...');
+    
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    
+    initAudio();
+    
+    const computer = document.getElementById('computer').value;
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const type = document.getElementById('type').value;
+    const notes = document.getElementById('notes').value;
+    
+    let schedules = getSchedules();
+    
+    // Conflict Check
+    const conflict = schedules.find(s => 
+        s.computer === computer && 
+        s.date === date && 
+        s.time === time && 
+        !s.completed
+    );
+    
+    if (conflict) {
+        alert('⚠️ Schedule Conflict!\\n\\nThis computer already has maintenance at this time.');
+        btn.disabled = false;
+        btn.textContent = '💾 Save Task';
+        return;
+    }
+    
+    const newTask = {
+        id: Date.now(),
+        computer,
+        date,
+        time,
+        type,
+        notes,
+        created: new Date().toISOString(),
+        completed: false,
+        notified: false,
+        userId: currentUser.id
+    };
+    
+    schedules.push(newTask);
+    saveSchedules(schedules);
+    
+    // Sync with SW
+    syncWithServiceWorker();
+    
+    // Update UI
+    renderTasks();
+    scheduleNextCheck();
+    resetForm();
+    
+    // Request notification permission if not set
+    if (Notification.permission === 'default') {
+        enableNotifications();
+    }
+    
+    // Visual feedback
+    btn.textContent = '✅ Saved!';
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = '💾 Save Task';
+    }, 1500);
+    
+    console.log('✅ Task saved:', newTask.id);
+}
+
+function resetForm() {
+    document.getElementById('maintenanceForm').reset();
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+        dateInput.min = new Date().toISOString().split('T')[0];
+    }
+}
+
+function deleteTask(id) {
+    if (!confirm('Delete this task?')) return;
+    
+    let schedules = getSchedules();
+    schedules = schedules.filter(s => s.id !== id);
+    saveSchedules(schedules);
+    
+    renderTasks();
+    scheduleNextCheck();
+    syncWithServiceWorker();
+    
+    console.log('🗑️ Task deleted:', id);
+}
+
+function renderTasks() {
+    const container = document.getElementById('taskList');
+    const countBadge = document.getElementById('taskCount');
+    const schedules = getSchedules();
+    
+    countBadge.textContent = schedules.length;
+    
+    if (schedules.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <div>No tasks scheduled</div>
+            </div>`;
+        return;
+    }
+    
+    const sorted = [...schedules].sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        return new Date(a.date + 'T' + b.time) - new Date(b.date + 'T' + b.time);
+    });
+    
+    const now = new Date();
+    
+    container.innerHTML = sorted.map(task => {
+        const taskDateTime = new Date(task.date + 'T' + task.time);
+        const diff = taskDateTime - now;
+        const isOverdue = diff < 0 && !task.completed;
+        const isSoon = !task.completed && diff > 0 && diff < 3600000;
+        
+        let statusClass = '';
+        if (task.completed) statusClass = '';
+        else if (isOverdue) statusClass = 'overdue';
+        else if (isSoon) statusClass = 'soon';
+        
+        const timeRemaining = task.completed ? '' : getTimeRemaining(taskDateTime, now);
+        
+        return `
+            <div class="task-item ${statusClass}">
+                ${timeRemaining ? `<div class="time-remaining">${timeRemaining}</div>` : ''}
+                <div class="task-computer">${task.computer} ${task.notified ? '✓' : ''}</div>
+                <div class="task-meta">
+                    <strong>${task.type}</strong><br>
+                    📅 ${formatDate(task.date)} at ${task.time}
+                    ${task.notes ? '<br>📝 ' + escapeHtml(task.notes) : ''}
+                </div>
+                <div class="task-actions">
+                    <button class="btn-small btn-delete" onclick="deleteTask(${task.id})">🗑️ Delete</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getTimeRemaining(target, now) {
+    const diff = target - now;
+    if (diff < 0) return 'OVERDUE';
+    if (diff < 60000) return '< 1m';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h';
+    return Math.floor(diff / 86400000) + 'd';
+}
+
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ==========================================
+// NOTIFICATION ENGINE
+// ==========================================
+function scheduleNextCheck() {
+    if (nextTaskTimeout) clearTimeout(nextTaskTimeout);
+    if (checkInterval) clearInterval(checkInterval);
+    
+    const schedules = getSchedules();
+    const now = new Date();
+    const pendingTasks = schedules.filter(s => !s.completed && !s.notified);
+    
+    if (pendingTasks.length === 0) {
+        document.getElementById('timerStatus').textContent = '⏱️ No tasks';
+        return;
+    }
+    
+    const nextTask = pendingTasks
+        .map(t => ({...t, dateTime: new Date(t.date + 'T' + t.time)}))
+        .filter(t => t.dateTime > now)
+        .sort((a, b) => a.dateTime - b.dateTime)[0];
+    
+    if (!nextTask) {
+        document.getElementById('timerStatus').textContent = '⏱️ All passed';
+        return;
+    }
+    
+    const msUntil = nextTask.dateTime - now;
+    const minutesUntil = Math.floor(msUntil / 60000);
+    
+    document.getElementById('timerStatus').textContent = 
+        minutesUntil < 1 ? '⏱️ < 1 min!' : `⏱️ ${minutesUntil}m`;
+    
+    // Schedule exact timeout
+    nextTaskTimeout = setTimeout(() => {
+        triggerNotification(nextTask);
+    }, Math.min(msUntil, 2147483647)); // Max safe timeout
+    
+    // Backup interval check every 10 seconds
+    checkInterval = setInterval(() => {
+        const currentTime = new Date();
+        
+        pendingTasks.forEach(task => {
+            const taskTime = new Date(task.date + 'T' + task.time);
+            const diff = taskTime - currentTime;
+            
+            if (diff <= 1000 && diff > -10000 && !task.notified) {
+                triggerNotification(task);
+            }
+        });
+        
+        // Update countdown display
+        if (nextTask && !nextTask.notified) {
+            const remaining = nextTask.dateTime - currentTime;
+            const mins = Math.floor(remaining / 60000);
+            document.getElementById('timerStatus').textContent = 
+                mins < 1 ? '⏱️ < 1 min!' : `⏱️ ${mins}m`;
+        }
+    }, 10000);
+}
+
+function triggerNotification(task) {
+    if (task.notified || task.completed) return;
+    
+    console.log('🔔 Triggering notification for task:', task.id);
+    
+    // Mark as notified
+    let schedules = getSchedules();
+    const taskIndex = schedules.findIndex(t => t.id === task.id);
+    if (taskIndex !== -1) {
+        schedules[taskIndex].notified = true;
+        saveSchedules(schedules);
+        renderTasks();
+    }
+    
+    // Play sound
+    playAlertSound();
+    
+    const title = `🔧 ${task.computer} - Maintenance Due!`;
+    const body = `${task.type} at ${task.time}`;
+    const options = {
+        body: body,
+        icon: 'icon-192x192.png',
+        badge: 'icon-72x72.png',
+        tag: String(task.id),
+        requireInteraction: true,
+        vibrate: [200, 100, 200],
+        data: { taskId: task.id }
+    };
+    
+    // Show system notification
+    if (Notification.permission === 'granted') {
+        if (swRegistration) {
+            swRegistration.showNotification(title, options);
+        } else {
+            new Notification(title, options);
+        }
+    }
+    
+    // Show in-app modal
+    showInAppNotification(task);
+    
+    // Reschedule for next task
+    setTimeout(scheduleNextCheck, 2000);
+}
+
+function showInAppNotification(task) {
+    document.getElementById('notifTitle').textContent = `${task.computer} - Maintenance Due!`;
+    document.getElementById('notifText').innerHTML = 
+        `<strong>${task.type}</strong><br>Time: ${task.time}${task.notes ? '<br><br>📝 ' + escapeHtml(task.notes) : ''}`;
+    document.getElementById('notificationOverlay').style.display = 'flex';
+    
+    // Auto-dismiss after 10 seconds
+    setTimeout(() => {
+        if (document.getElementById('notificationOverlay').style.display === 'flex') {
+            dismissNotification();
+        }
+    }, 10000);
+}
+
+function dismissNotification() {
+    document.getElementById('notificationOverlay').style.display = 'none';
+}
+
+function syncWithServiceWorker() {
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        const schedules = getSchedules();
+        navigator.serviceWorker.controller.postMessage({
+            type: 'SYNC_SCHEDULES',
+            schedules: schedules.filter(s => !s.completed && !s.notified)
+        });
+    }
+}
+</script>
+</body>
+</html>'''
